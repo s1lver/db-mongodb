@@ -33,7 +33,7 @@ services:
     image: mongo:latest
     volumes:
       - ./mongo-key.key:/data/mongo-key.key:ro
-    command: bash -c 'ls -la /data && mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-primary --keyFile /data/mongo-key.key'
+    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-primary --keyFile /data/mongo-key.key"
     ports:
       - "${MONGODB_PORT_PRIMARY:-27017}:${MONGODB_PORT_PRIMARY:-27017}"
     depends_on:
@@ -43,9 +43,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGODB_ROOT_USER: root
-      MONGODB_ROOT_PASSWORD: password
-      MONGODB_REPLICA_SET_KEY: replica-set-key-1
     networks:
       db-mongodb-network:
         ipv4_address: 172.20.128.2
@@ -57,16 +54,13 @@ services:
     image: mongo:latest
     volumes:
       - ./mongo-key.key:/data/mongo-key.key:ro
-    command: bash -c 'ls -la /data/mongo-key.key && mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-secondary --keyFile /data/mongo-key.key'
+    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-secondary --keyFile /data/mongo-key.key"
     ports:
       - "${MONGODB_PORT_SECONDARY:-27018}:${MONGODB_PORT_SECONDARY:-27017}"
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGODB_ROOT_USER: root
-      MONGODB_ROOT_PASSWORD: password
-      MONGODB_REPLICA_SET_KEY: replica-set-key-1
     networks:
       db-mongodb-network:
         ipv4_address: 172.20.128.3
@@ -78,16 +72,13 @@ services:
     image: mongo:latest
     volumes:
       - ./mongo-key.key:/data/mongo-key.key:ro
-    command: bash -c 'ls -la /data/mongo-key.key && mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-arbiter --keyFile /data/mongo-key.key'
+    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-arbiter --keyFile /data/mongo-key.key"
     ports:
       - "${MONGODB_PORT_ARBITER:-27019}:${MONGODB_PORT_ARBITER:-27017}"
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGODB_ROOT_USER: root
-      MONGODB_ROOT_PASSWORD: password
-      MONGODB_REPLICA_SET_KEY: replica-set-key-1
     networks:
       db-mongodb-network:
         ipv4_address: 172.20.128.4
