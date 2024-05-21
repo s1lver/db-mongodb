@@ -2,8 +2,6 @@ help:			## Display help information
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
 build:			## Build an image from a docker-compose file. Params: {{ v=8.1 }}. Default latest PHP 8.1
-	make generate-mongo-key
-	sleep 5
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose up -d --build
 	make composer-update
 
@@ -17,15 +15,11 @@ composer-update:	## Composer update
 	docker exec db-mongodb-php composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
 test:			## Run tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose build --pull db-mongodb-php
-	sleep 5
-	make create-cluster-mongodb
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose run db-mongodb-php vendor/bin/phpunit --coverage-clover coverage.xml
 	make down
 
 mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose build --pull db-mongodb-php
-	sleep 5
 	make create-cluster-mongodb
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose run db-mongodb-php vendor/bin/roave-infection-static-analysis-plugin --threads=2 --ignore-msi-with-no-mutations --only-covered
 	make down

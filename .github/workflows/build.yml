@@ -38,6 +38,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Generate key
+        run: |
+          make generate-mongo-key
+          chmod 400 ./mongo-key.key
+
       - name: Build
         run: make build v=${{ matrix.php }}
 
@@ -46,6 +51,9 @@ jobs:
 
       - name: Container logs
         run: docker logs db-mongodb-db-primary
+
+      - name: Create cluster
+        run: make create-cluster-mongodb
 
       - name: Run tests with phpunit
         run: make test v=${{ matrix.php }}
