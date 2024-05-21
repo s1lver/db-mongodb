@@ -31,7 +31,7 @@ mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8
 	make down
 
 generate-mongo-key:	## Generate key for MongoDB cluster
-	@if [ -f mongo-key.key ] ; then chmod 777 mongo-key.key; rm mongo-key.key; fi
+	@if [ -f ./mongo-key.key ] ; then chmod 777 ./mongo-key.key; rm ./mongo-key.key; fi
 	openssl rand -base64 756 > ./mongo-key.key && chmod 400 ./mongo-key.key
 
 create-cluster-mongodb:	## Create MongoDB cluster
