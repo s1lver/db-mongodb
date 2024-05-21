@@ -32,7 +32,7 @@ services:
     hostname: db-mongodb-db-primary
     image: mongo
     volumes:
-      - ./mongo-key.key:/data/mongo-key.key
+      - ./mongo-key.key:/data/mongo-key.key:ro
     command: mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-primary --keyFile /data/mongo-key.key
     ports:
       - "${MONGODB_PORT_PRIMARY:-27017}:${MONGODB_PORT_PRIMARY:-27017}"
@@ -56,7 +56,7 @@ services:
     hostname: db-mongodb-db-secondary
     image: mongo
     volumes:
-      - ./mongo-key.key:/data/mongo-key.key
+      - ./mongo-key.key:/data/mongo-key.key:ro
     command: mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-secondary --keyFile /data/mongo-key.key
     ports:
       - "${MONGODB_PORT_SECONDARY:-27018}:${MONGODB_PORT_SECONDARY:-27017}"
@@ -77,7 +77,7 @@ services:
     hostname: db-mongodb-db-arbiter
     image: mongo
     volumes:
-      - ./mongo-key.key:/data/mongo-key.key
+      - ./mongo-key.key:/data/mongo-key.key:ro
     command: mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-arbiter --keyFile /data/mongo-key.key
     ports:
       - "${MONGODB_PORT_ARBITER:-27019}:${MONGODB_PORT_ARBITER:-27017}"
