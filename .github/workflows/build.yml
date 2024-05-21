@@ -45,6 +45,7 @@ jobs:
           ls -la mongo-key.key
           sleep 5
           make build v=${{ matrix.php }}
+        shell: bash
 
       - name: Debug
         run: docker ps -a

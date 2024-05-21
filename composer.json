@@ -41,6 +41,7 @@
         "phpunit/phpunit": "^10.0",
         "roave/infection-static-analysis-plugin": "^1.6",
         "spatie/phpunit-watcher": "^1.23",
+        "maglnet/composer-require-checker": "^4.4",
         "vimeo/psalm": "^5.20",
         "yiisoft/arrays": "^3.0",
         "yiisoft/di": "^1.2.0",
