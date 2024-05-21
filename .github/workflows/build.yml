@@ -40,10 +40,10 @@ jobs:
 
       - name: Build
         run: |
-          make generate-mongo-key
+          openssl rand -base64 756 > ./mongo-key.key
           sudo chmod 400 ./mongo-key.key
           ls -la mongo-key.key
-          sleep 5
+          sleep 10
           make build v=${{ matrix.php }}
         shell: bash
 
