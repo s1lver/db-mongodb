@@ -44,5 +44,8 @@ jobs:
       - name: Debug
         run: docker ps -a
 
+      - name: Container logs
+        run: docker logs db-mongodb-db-primary
+
       - name: Run tests with phpunit
         run: make test v=${{ matrix.php }}
