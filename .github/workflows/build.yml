@@ -40,6 +40,7 @@ jobs:
 
       - name: Build
         run: |
+          pwd
           openssl rand -base64 756 > ./mongo-key.key
           sudo chmod 400 ./mongo-key.key
           ls -la mongo-key.key

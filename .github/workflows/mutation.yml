@@ -37,7 +37,9 @@ jobs:
 
       - name: Run infection
         run: |
+          make generate-mongo-key
           make build v=${{ matrix.php }}
+          make create-cluster-mongodb
           make mutation-test v=${{ matrix.php }}
         env:
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}

@@ -19,8 +19,6 @@ test:			## Run tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
 	make down
 
 mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
-	PHP_VERSION=$(filter-out $@,$(v)) docker-compose build --pull db-mongodb-php
-	make create-cluster-mongodb
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose run db-mongodb-php vendor/bin/roave-infection-static-analysis-plugin --threads=2 --ignore-msi-with-no-mutations --only-covered
 	make down
 
