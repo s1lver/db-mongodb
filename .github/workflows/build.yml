@@ -34,10 +34,6 @@ jobs:
           - '8.2'
           - '8.3'
 
-    defaults:
-      run:
-        working-directory: .
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,6 +42,8 @@ jobs:
         run: |
           make generate-mongo-key
           sudo chmod 400 ./mongo-key.key
+          ls -la mongo-key.key
+          sleep 5
           make build v=${{ matrix.php }}
 
       - name: Debug
