@@ -33,7 +33,7 @@ services:
     image: mongo
     volumes:
       - ./mongo-key.key:/data/mongo-key.key:ro
-    command: ls -la /data/mongo-key.key && mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-primary --keyFile /data/mongo-key.key
+    command: ls /data && mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-primary --keyFile /data/mongo-key.key
     ports:
       - "${MONGODB_PORT_PRIMARY:-27017}:${MONGODB_PORT_PRIMARY:-27017}"
     depends_on:
