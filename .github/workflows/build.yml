@@ -41,5 +41,8 @@ jobs:
       - name: Build
         run: make build v=${{ matrix.php }}
 
+      - name: Debug
+        run: docker ps -a
+
       - name: Run tests with phpunit
         run: make test v=${{ matrix.php }}
