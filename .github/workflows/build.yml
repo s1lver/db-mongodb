@@ -42,16 +42,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate key
+      - name: Build
         run: |
           make generate-mongo-key
           sudo chmod 400 ./mongo-key.key
-        with:
-          name: output-mongo-key
-          path: mongo-key.key
-
-      - name: Build
-        run: make build v=${{ matrix.php }}
+          make build v=${{ matrix.php }}
 
       - name: Debug
         run: docker ps -a
