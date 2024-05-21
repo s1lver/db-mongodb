@@ -18,12 +18,14 @@ composer-update:	## Composer update
 
 test:			## Run tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
 	make build
+	sleep 2
 	make create-cluster-mongodb
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose run db-mongodb-php vendor/bin/phpunit --coverage-clover coverage.xml
 	make down
 
 mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
 	make build
+	sleep 2
 	make create-cluster-mongodb
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose run db-mongodb-php vendor/bin/roave-infection-static-analysis-plugin --threads=2 --ignore-msi-with-no-mutations --only-covered
 	make down
