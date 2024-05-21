@@ -1,3 +1,4 @@
+---
 version: '3.8'
 
 services:
@@ -14,13 +15,78 @@ services:
     networks: &network
       - db-mongodb-network
 
-  db-mongodb-db:
+  # MongoDB single instance
+  db-mongodb-db-single:
     image: mongo
-    container_name: db-mongodb-db
+    container_name: db-mongodb-db-single
+    hostname: db-mongodb-db-single
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+    networks: *network
+
+  # MongoDB replicaset primary
+  db-mongodb-db-primary:
+    container_name: db-mongodb-db-primary
+    hostname: db-mongodb-db-primary
+    image: mongo
+    volumes:
+      - mongo-data-primary:/data/db
+      - ./mongo-key.key:/data/mongo-key.key
+    command: mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-primary --keyFile /data/mongo-key.key
+    ports:
+      - "${MONGODB_PORT_PRIMARY:-27017}:${MONGODB_PORT_PRIMARY:-27017}"
+    depends_on:
+      - db-mongodb-db-secondary
+      - db-mongodb-db-arbiter
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGODB_ROOT_USER: root
+      MONGODB_ROOT_PASSWORD: password
+      MONGODB_REPLICA_SET_KEY: replica-set-key-1
+    networks: *network
+
+  # MongoDB replicaset secondary
+  db-mongodb-db-secondary:
+    container_name: db-mongodb-db-secondary
+    hostname: db-mongodb-db-secondary
+    image: mongo
+    volumes:
+      - mongo-data-secondary:/data/db
+      - ./mongo-key.key:/data/mongo-key.key
+    command: mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-secondary --keyFile /data/mongo-key.key
+    ports:
+      - "${MONGODB_PORT_SECONDARY:-27018}:${MONGODB_PORT_SECONDARY:-27017}"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGODB_ROOT_USER: root
+      MONGODB_ROOT_PASSWORD: password
+      MONGODB_REPLICA_SET_KEY: replica-set-key-1
+    networks: *network
+
+  # MongoDB replicaset arbiter
+  db-mongodb-db-arbiter:
+    container_name: db-mongodb-db-arbiter
+    hostname: db-mongodb-db-arbiter
+    image: mongo
+    volumes:
+      - mongo-data-arbiter:/data/db
+      - ./mongo-key.key:/data/mongo-key.key
+    command: mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-arbiter --keyFile /data/mongo-key.key
+    ports:
+      - "${MONGODB_PORT_ARBITER:-27019}:${MONGODB_PORT_ARBITER:-27017}"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGODB_ROOT_USER: root
+      MONGODB_ROOT_PASSWORD: password
+      MONGODB_REPLICA_SET_KEY: replica-set-key-1
     networks: *network
 
 networks:
@@ -29,3 +95,11 @@ networks:
     ipam:
       config:
         - subnet: 172.20.0.0/16
+
+volumes:
+  mongo-data-primary:
+    driver: local
+  mongo-data-secondary:
+    driver: local
+  mongo-data-arbiter:
+    driver: local

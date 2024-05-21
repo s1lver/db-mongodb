@@ -30,3 +30,6 @@ phpunit.phar
 
 # local tests configuration
 /tests/data/config.local.php
+
+# MongoDB temp files
+mongo-key.key
