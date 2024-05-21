@@ -3,7 +3,7 @@ help:			## Display help information
 
 build:			## Build an image from a docker-compose file. Params: {{ v=8.1 }}. Default latest PHP 8.1
 	make generate-mongo-key
-	sleep 2
+	sleep 5
 	PHP_VERSION=$(filter-out $@,$(v)) docker-compose up -d --build
 	make composer-update
 
