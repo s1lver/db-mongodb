@@ -37,6 +37,6 @@ jobs:
 
       - name: Run infection
         run: |
-          make build v=${{ matrix.php }}
+          make mutation-test v=${{ matrix.php }}
         env:
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}

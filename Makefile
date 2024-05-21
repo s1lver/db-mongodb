@@ -16,6 +16,18 @@ sh:			## Enter the container with the application
 composer-update:	## Composer update
 	docker exec -it db-mongodb-php composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
+test:			## Run tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
+	make build
+	make create-cluster-mongodb
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose run db-mongodb-php vendor/bin/phpunit --coverage-clover coverage.xml
+	make down
+
+mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8.1
+	make build
+	make create-cluster-mongodb
+	PHP_VERSION=$(filter-out $@,$(v)) docker-compose run db-mongodb-php vendor/bin/roave-infection-static-analysis-plugin --threads=2 --ignore-msi-with-no-mutations --only-covered
+	make down
+
 generate-mongo-key:	## Generate key for MongoDB cluster
 	@if [ -f mongo-key.key ] ; then chmod 777 mongo-key.key; rm mongo-key.key; fi
 	openssl rand -base64 756 > ./mongo-key.key && chmod 400 ./mongo-key.key
