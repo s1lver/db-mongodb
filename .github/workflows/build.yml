@@ -46,7 +46,9 @@ jobs:
         run: |
           make generate-mongo-key
           sudo chmod 400 ./mongo-key.key
-          sleep 5
+        with:
+          name: output-mongo-key
+          path: mongo-key.key
 
       - name: Build
         run: make build v=${{ matrix.php }}
