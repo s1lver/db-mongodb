@@ -6,7 +6,6 @@
 
 ### What do you get instead?
 
-
 ### Additional info
 
 | Q                | A
