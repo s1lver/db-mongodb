@@ -21,6 +21,8 @@ services:
     container_name: db-mongodb-db-single
     hostname: db-mongodb-db-single
     restart: always
+    volumes:
+      - db-mongodb-db-single:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
@@ -32,8 +34,8 @@ services:
     hostname: db-mongodb-db-primary
     image: mongo:latest
     volumes:
-      - ./mongo-key.key:/data/mongo-key.key:ro
-    command: ["--replSet", "myReplicaSet", "--bind_ip", "localhost,db-mongodb-db-primary", "--keyFile", "/data/mongo-key.key"]
+      - db-mongodb-db-primary:/data/db
+    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-primary --keyFile /run/secrets/mongo-keyfile"
     ports:
       - "${MONGODB_PORT_PRIMARY:-27017}:${MONGODB_PORT_PRIMARY:-27017}"
     depends_on:
@@ -43,6 +45,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+    secrets:
+      - mongo-keyfile
     networks:
       db-mongodb-network:
         ipv4_address: 172.20.128.2
@@ -53,14 +57,16 @@ services:
     hostname: db-mongodb-db-secondary
     image: mongo:latest
     volumes:
-      - ./mongo-key.key:/data/mongo-key.key:ro
-    command: ["--replSet", "myReplicaSet", "--bind_ip", "localhost,db-mongodb-db-secondary", "--keyFile", "/data/mongo-key.key"]
+      - db-mongodb-db-secondary:/data/db
+    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-secondary --keyFile /run/secrets/mongo-keyfile"
     ports:
       - "${MONGODB_PORT_SECONDARY:-27018}:${MONGODB_PORT_SECONDARY:-27017}"
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+    secrets:
+      - mongo-keyfile
     networks:
       db-mongodb-network:
         ipv4_address: 172.20.128.3
@@ -71,17 +77,29 @@ services:
     hostname: db-mongodb-db-arbiter
     image: mongo:latest
     volumes:
-      - ./mongo-key.key:/data/mongo-key.key:ro
-    command: ["--replSet", "myReplicaSet", "--bind_ip", "localhost,db-mongodb-db-arbiter", "--keyFile", "/data/mongo-key.key"]
+      - db-mongodb-db-arbiter:/data/db
+    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-arbiter --keyFile /run/secrets/mongo-keyfile"
     ports:
       - "${MONGODB_PORT_ARBITER:-27019}:${MONGODB_PORT_ARBITER:-27017}"
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+    secrets:
+      - mongo-keyfile
     networks:
       db-mongodb-network:
         ipv4_address: 172.20.128.4
+
+volumes:
+  db-mongodb-db-arbiter:
+  db-mongodb-db-secondary:
+  db-mongodb-db-primary:
+  db-mongodb-db-single:
+
+secrets:
+  mongo-keyfile:
+    file: ./mongo-keyfile
 
 networks:
   db-mongodb-network:

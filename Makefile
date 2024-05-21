@@ -23,8 +23,8 @@ mutation-test:		## Run mutation tests. Params: {{ v=8.1 }}. Default latest PHP 8
 	make down
 
 generate-mongo-key:	## Generate key for MongoDB cluster
-	@if [ -f ./mongo-key.key ] ; then chmod 777 ./mongo-key.key; rm ./mongo-key.key; fi
-	openssl rand -base64 756 > ./mongo-key.key && chmod 400 ./mongo-key.key
+	@if [ -f ./mongo-keyfile ] ; then chmod 777 ./mongo-keyfile; rm ./mongo-keyfile; fi
+	openssl rand -base64 756 > ./mongo-keyfile && chmod 400 ./mongo-keyfile
 
 create-cluster-mongodb:	## Create MongoDB cluster
 	docker exec db-mongodb-db-primary mongosh --quiet --host db-mongodb-db-primary --port 27017 --eval "EJSON.stringify(db.getSiblingDB('admin').auth('root', 'password'));" --eval "EJSON.stringify(rs.initiate({_id: 'myReplicaSet', version: 1, members: [{ _id: 0, host: 'db-mongodb-db-primary:27017', 'priority': 2 }, { _id: 1, host: 'db-mongodb-db-secondary:27017', 'priority': 1 }, { _id: 2, host: 'db-mongodb-db-arbiter:27017', 'priority': 1, 'arbiterOnly': true }]}));"
