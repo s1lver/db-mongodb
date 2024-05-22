@@ -43,6 +43,9 @@ jobs:
           make build v=${{ matrix.php }}
           make prepare-create-cluster-mongodb
 
+      - name: Containers status
+        run: docker ps -a
+
       - name: Create cluster
         run: make create-cluster-mongodb
 
