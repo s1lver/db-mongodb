@@ -43,6 +43,13 @@ services:
       - db-mongodb-db-secondary
       - db-mongodb-db-arbiter
     restart: always
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | db-mongodb-db-primary db-mongodb-db-primary:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
