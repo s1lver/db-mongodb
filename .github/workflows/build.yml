@@ -53,10 +53,11 @@ jobs:
       - name: Primary container logs
         run: docker logs db-mongodb-db-primary
 
+      - name: Prepare create cluster
+        run: make prepare-create-cluster-mongodb
+
       - name: Create cluster
-        run: |
-          make prepare-create-cluster-mongodb
-          make create-cluster-mongodb
+        run: make create-cluster-mongodb
 
       - name: Run tests with phpunit
         run: make test v=${{ matrix.php }}

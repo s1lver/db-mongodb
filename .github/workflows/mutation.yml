@@ -35,14 +35,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run infection
+      - name: Prepare crete cluster
         run: |
           mkdir ./runtime
           touch ./runtime/mongod.conf
           make generate-mongo-key
           make build v=${{ matrix.php }}
           make prepare-create-cluster-mongodb
-          make create-cluster-mongodb
-          make mutation-test v=${{ matrix.php }}
+
+      - name: Create cluster
+        run: make create-cluster-mongodb
+
+      - name: Run infection
+        run: make mutation-test v=${{ matrix.php }}
         env:
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
