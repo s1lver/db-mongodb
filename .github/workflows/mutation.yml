@@ -35,13 +35,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare crete cluster
+      - name: Build
         run: |
           mkdir ./runtime
           touch ./runtime/mongod.conf
           make generate-mongo-key
           make build v=${{ matrix.php }}
-          make prepare-create-cluster-mongodb
 
       - name: Create cluster
         run: make create-cluster-mongodb

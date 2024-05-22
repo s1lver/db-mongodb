@@ -26,7 +26,7 @@ generate-mongo-key:		## Generate key for MongoDB cluster
 	@if [ -f ./mongo-keyfile ] ; then chmod 777 ./mongo-keyfile; rm ./mongo-keyfile; fi
 	openssl rand -base64 756 > ./mongo-keyfile && chmod 400 ./mongo-keyfile
 
-prepare-create-cluster-mongodb:	## Prepare to create MongoDB cluster
+create-cluster-mongodb:		## Create MongoDB cluster
 	docker exec db-mongodb-db-primary mongosh --quiet --host db-mongodb-db-primary --port 27017 --eval "EJSON.stringify(db.getSiblingDB('admin').auth('root', 'password'));" --eval "EJSON.stringify(db.getSiblingDB('admin').createUser({user: 'replicaUser', pwd: 'password', roles: [{role: 'root', db: 'admin'}]}));"
 
 	echo "security:" >> ./runtime/mongod.conf
@@ -36,7 +36,8 @@ prepare-create-cluster-mongodb:	## Prepare to create MongoDB cluster
 	echo "net:" >> ./runtime/mongod.conf
 	echo "  bindIpAll: true" >> ./runtime/mongod.conf
 
-	docker exec db-mongodb-db-primary mongosh --quiet --host db-mongodb-db-primary --port 27017 --eval "EJSON.stringify(db.getSiblingDB('admin').auth('root', 'password'));" --eval "EJSON.stringify(db.shutdownServer());"
+	docker exec db-mongodb-db-primary mongosh --quiet --host db-mongodb-db-primary --port 27017 --eval "EJSON.stringify(db.getSiblingDB('admin').auth('root', 'password'));" --eval "EJSON.stringify(db.shutdownServer());" || true
 
-create-cluster-mongodb:		## Create MongoDB cluster
+	sleep 5
+
 	docker exec db-mongodb-db-primary mongosh --quiet --host db-mongodb-db-primary --port 27017 --eval "EJSON.stringify(db.getSiblingDB('admin').auth('replicaUser', 'password'));" --eval "EJSON.stringify(rs.initiate({_id: 'myReplicaSet', version: 1, members: [{ _id: 0, host: 'db-mongodb-db-primary:27017', 'priority': 2 }, { _id: 1, host: 'db-mongodb-db-secondary:27017', 'priority': 1 }, { _id: 2, host: 'db-mongodb-db-arbiter:27017', 'priority': 1, 'arbiterOnly': true }]}));"
