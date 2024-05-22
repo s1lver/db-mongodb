@@ -41,6 +41,7 @@ jobs:
           touch ./runtime/mongod.conf
           make generate-mongo-key
           make build v=${{ matrix.php }}
+          make prepare-create-cluster-mongodb
 
       - name: Create cluster
         run: make create-cluster-mongodb
