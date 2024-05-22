@@ -44,7 +44,7 @@ services:
       - db-mongodb-db-arbiter
     restart: always
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | db-mongodb-db-primary db-mongodb-db-primary:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet --host db-mongodb-db-primary --port 27017
       interval: 10s
       timeout: 10s
       retries: 5
