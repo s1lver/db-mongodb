@@ -49,15 +49,12 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
-
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
     secrets:
       - mongo-keyfile
-    networks:
-      db-mongodb-network:
-        ipv4_address: 172.20.128.2
+    networks: *network
 
   # MongoDB replicaset secondary
   db-mongodb-db-secondary:
@@ -75,9 +72,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     secrets:
       - mongo-keyfile
-    networks:
-      db-mongodb-network:
-        ipv4_address: 172.20.128.3
+    networks: *network
 
   # MongoDB replicaset arbiter
   db-mongodb-db-arbiter:
@@ -95,9 +90,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     secrets:
       - mongo-keyfile
-    networks:
-      db-mongodb-network:
-        ipv4_address: 172.20.128.4
+    networks: *network
 
 volumes:
   db-mongodb-db-arbiter:
