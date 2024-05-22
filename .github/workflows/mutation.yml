@@ -51,6 +51,11 @@ jobs:
         with:
           time: '10s'
 
+      - name: Primary container logs
+        run: |
+          docker logs db-mongodb-db-primary
+          docker exec db-mongodb-db-primary cat /etc/mongod.conf
+
       - name: Create cluster
         run: make create-cluster-mongodb
 

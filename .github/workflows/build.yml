@@ -64,6 +64,9 @@ jobs:
         with:
           time: '10s'
 
+      - name: Primary container logs
+        run: docker logs db-mongodb-db-primary
+
       - name: Create cluster
         run: make create-cluster-mongodb
 
