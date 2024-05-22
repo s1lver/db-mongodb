@@ -35,7 +35,8 @@ services:
     image: mongo:latest
     volumes:
       - db-mongodb-db-primary:/data/db
-    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-primary --keyFile /run/secrets/mongo-keyfile"
+      - ./runtime/mongod.conf:/etc/mongod.conf
+    command: "mongod --config /etc/mongod.conf"
     ports:
       - "${MONGODB_PORT_PRIMARY:-27017}:${MONGODB_PORT_PRIMARY:-27017}"
     depends_on:
@@ -58,7 +59,7 @@ services:
     image: mongo:latest
     volumes:
       - db-mongodb-db-secondary:/data/db
-    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-secondary --keyFile /run/secrets/mongo-keyfile"
+    command: bash -c 'mongod --replSet myReplicaSet --bind_ip_all --keyFile /run/secrets/mongo-keyfile'
     ports:
       - "${MONGODB_PORT_SECONDARY:-27018}:${MONGODB_PORT_SECONDARY:-27017}"
     restart: always
@@ -78,7 +79,7 @@ services:
     image: mongo:latest
     volumes:
       - db-mongodb-db-arbiter:/data/db
-    command: "mongod --replSet myReplicaSet --bind_ip localhost,db-mongodb-db-arbiter --keyFile /run/secrets/mongo-keyfile"
+    command: bash -c 'mongod --replSet myReplicaSet --bind_ip_all --keyFile /run/secrets/mongo-keyfile'
     ports:
       - "${MONGODB_PORT_ARBITER:-27019}:${MONGODB_PORT_ARBITER:-27017}"
     restart: always

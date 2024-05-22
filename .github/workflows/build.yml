@@ -40,20 +40,23 @@ jobs:
 
       - name: Build
         run: |
-          pwd
+          mkdir ./runtime
+          touch ./runtime/mongod.conf
           openssl rand -base64 756 > ./mongo-keyfile
           sudo chmod 400 ./mongo-keyfile
           make build v=${{ matrix.php }}
         shell: bash
 
-      - name: Debug
+      - name: Containers status
         run: docker ps -a
 
-      - name: Container logs
+      - name: Primary container logs
         run: docker logs db-mongodb-db-primary
 
       - name: Create cluster
-        run: make create-cluster-mongodb
+        run: |
+          make prepare-create-cluster-mongodb
+          make create-cluster-mongodb
 
       - name: Run tests with phpunit
         run: make test v=${{ matrix.php }}
