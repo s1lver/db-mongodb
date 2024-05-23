@@ -1,0 +1,63 @@
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'psalm.xml'
+
+  push:
+    branches: [ 'master' ]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'psalm.xml'
+
+name: Mutation test
+
+jobs:
+  mutation:
+    name: PHP ${{ matrix.php }}-${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ 'ubuntu-latest' ]
+        php: [ '8.3' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          mkdir ./runtime
+          touch ./runtime/mongod.conf
+          make generate-mongo-key
+          make build v=${{ matrix.php }}
+          make prepare-create-cluster-mongodb
+
+      - name: Containers status
+        run: docker ps -a
+
+      - name: Primary container logs
+        run: |
+          docker logs db-mongodb-db-primary
+          docker exec db-mongodb-db-primary cat /etc/mongod.conf
+
+      - name: Create cluster
+        run: |
+          docker restart db-mongodb-db-primary || true
+          docker exec db-mongodb-db-primary cat /etc/mongod.conf
+          make create-cluster-mongodb
+
+      - name: Run infection
+        run: make mutation-test v=${{ matrix.php }}
+        env:
+          STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}

@@ -1,0 +1,72 @@
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+  push:
+    branches: [ 'master' ]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+name: Run tests
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - '8.1'
+          - '8.2'
+          - '8.3'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          mkdir ./runtime
+          touch ./runtime/mongod.conf
+          openssl rand -base64 756 > ./mongo-keyfile
+          sudo chmod 400 ./mongo-keyfile
+          make build v=${{ matrix.php }}
+        shell: bash
+
+      - name: Containers status
+        run: docker ps -a
+
+      - name: Primary container logs
+        run: docker logs db-mongodb-db-primary
+
+      - name: Prepare create cluster
+        run: make prepare-create-cluster-mongodb
+
+      - name: Containers status
+        run: docker ps -a
+
+      - name: Primary container logs
+        run: docker logs db-mongodb-db-primary
+
+      - name: Create cluster
+        run: |
+          docker restart db-mongodb-db-primary || true
+          docker exec db-mongodb-db-primary cat /etc/mongod.conf
+          make create-cluster-mongodb
+
+      - name: Run tests with phpunit
+        run: make test v=${{ matrix.php }}

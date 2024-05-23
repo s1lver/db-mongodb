@@ -1,3 +1,4 @@
+---
 version: '3.8'
 
 services:
@@ -14,14 +15,97 @@ services:
     networks: &network
       - db-mongodb-network
 
-  db-mongodb-db:
+  # MongoDB single instance
+  db-mongodb-db-single:
     image: mongo
-    container_name: db-mongodb-db
+    container_name: db-mongodb-db-single
+    hostname: db-mongodb-db-single
     restart: always
+    volumes:
+      - db-mongodb-db-single:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
     networks: *network
+
+  # MongoDB replicaset primary
+  db-mongodb-db-primary:
+    container_name: db-mongodb-db-primary
+    hostname: db-mongodb-db-primary
+    image: mongo:latest
+    volumes:
+      - db-mongodb-db-primary:/data/db
+      - ./runtime/mongod.conf:/etc/mongod.conf
+    command:
+      - bash
+      - -c
+      - |
+        chmod 400 /run/secrets/mongo-keyfile
+        mongod --config /etc/mongod.conf
+    ports:
+      - "${MONGODB_PORT_PRIMARY:-27017}:${MONGODB_PORT_PRIMARY:-27017}"
+    depends_on:
+      - db-mongodb-db-secondary
+      - db-mongodb-db-arbiter
+    restart: always
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet 1
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    secrets:
+      - mongo-keyfile
+    networks: *network
+
+  # MongoDB replicaset secondary
+  db-mongodb-db-secondary:
+    container_name: db-mongodb-db-secondary
+    hostname: db-mongodb-db-secondary
+    image: mongo:latest
+    volumes:
+      - db-mongodb-db-secondary:/data/db
+    command: bash -c 'mongod --replSet myReplicaSet --bind_ip_all --keyFile /run/secrets/mongo-keyfile'
+    ports:
+      - "${MONGODB_PORT_SECONDARY:-27018}:${MONGODB_PORT_SECONDARY:-27017}"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    secrets:
+      - mongo-keyfile
+    networks: *network
+
+  # MongoDB replicaset arbiter
+  db-mongodb-db-arbiter:
+    container_name: db-mongodb-db-arbiter
+    hostname: db-mongodb-db-arbiter
+    image: mongo:latest
+    volumes:
+      - db-mongodb-db-arbiter:/data/db
+    command: bash -c 'mongod --replSet myReplicaSet --bind_ip_all --keyFile /run/secrets/mongo-keyfile'
+    ports:
+      - "${MONGODB_PORT_ARBITER:-27019}:${MONGODB_PORT_ARBITER:-27017}"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    secrets:
+      - mongo-keyfile
+    networks: *network
+
+volumes:
+  db-mongodb-db-arbiter:
+  db-mongodb-db-secondary:
+  db-mongodb-db-primary:
+  db-mongodb-db-single:
+
+secrets:
+  mongo-keyfile:
+    file: ./mongo-keyfile
 
 networks:
   db-mongodb-network:

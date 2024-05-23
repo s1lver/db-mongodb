@@ -3,9 +3,9 @@
 ARG PHP_VERSION
 FROM --platform=linux/amd64 php:${PHP_VERSION}-cli-alpine
 
-RUN apk --no-cache add unzip zlib-dev libzip-dev autoconf g++ make
+RUN apk --no-cache add unzip autoconf g++ make
 
-RUN docker-php-ext-install zip opcache
+RUN docker-php-ext-install opcache
 RUN pecl install pcov-1.0.11 mongodb
 RUN docker-php-ext-enable pcov mongodb
 
