@@ -34,6 +34,7 @@ prepare-create-cluster-mongodb:	## Prepare to create MongoDB cluster
 	echo "replication:" >> ./runtime/mongod.conf
 	echo "  replSetName: myReplicaSet" >> ./runtime/mongod.conf
 	echo "net:" >> ./runtime/mongod.conf
+	echo "  port: 27017" >> ./runtime/mongod.conf
 	echo "  bindIpAll: true" >> ./runtime/mongod.conf
 
 	docker exec db-mongodb-db-primary mongosh --quiet --host db-mongodb-db-primary --port 27017 --eval "EJSON.stringify(db.getSiblingDB('admin').auth('root', 'password'));" --eval "EJSON.stringify(db.shutdownServer());" || true
