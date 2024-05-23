@@ -36,7 +36,7 @@ services:
     volumes:
       - db-mongodb-db-primary:/data/db
       - ./runtime/mongod.conf:/etc/mongod.conf
-    command: bash -c 'mongod --config /etc/mongod.conf'
+    command: ["--config", "/etc/mongod.conf"]
     ports:
       - "${MONGODB_PORT_PRIMARY:-27017}:${MONGODB_PORT_PRIMARY:-27017}"
     depends_on:

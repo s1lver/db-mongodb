@@ -59,11 +59,6 @@ jobs:
       - name: Containers status
         run: docker ps -a
 
-      - name: Sleep for 30 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '10s'
-
       - name: Primary container logs
         run: docker logs db-mongodb-db-primary
 
@@ -71,4 +66,6 @@ jobs:
         run: make create-cluster-mongodb
 
       - name: Run tests with phpunit
-        run: make test v=${{ matrix.php }}
+        run: |
+          docker exec db-mongodb-db-primary cat /etc/mongod.conf
+          make test v=${{ matrix.php }}
