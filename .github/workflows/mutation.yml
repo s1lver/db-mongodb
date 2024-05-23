@@ -53,6 +53,7 @@ jobs:
 
       - name: Create cluster
         run: |
+          docker restart db-mongodb-db-primary || true
           docker exec db-mongodb-db-primary cat /etc/mongod.conf
           make create-cluster-mongodb
 
