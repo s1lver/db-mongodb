@@ -63,9 +63,9 @@ jobs:
         run: docker logs db-mongodb-db-primary
 
       - name: Create cluster
-        run: make create-cluster-mongodb
-
-      - name: Run tests with phpunit
         run: |
           docker exec db-mongodb-db-primary cat /etc/mongod.conf
-          make test v=${{ matrix.php }}
+          make create-cluster-mongodb
+
+      - name: Run tests with phpunit
+        run: make test v=${{ matrix.php }}

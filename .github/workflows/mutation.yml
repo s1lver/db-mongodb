@@ -52,7 +52,9 @@ jobs:
           docker exec db-mongodb-db-primary cat /etc/mongod.conf
 
       - name: Create cluster
-        run: make create-cluster-mongodb
+        run: |
+          docker exec db-mongodb-db-primary cat /etc/mongod.conf
+          make create-cluster-mongodb
 
       - name: Run infection
         run: make mutation-test v=${{ matrix.php }}
